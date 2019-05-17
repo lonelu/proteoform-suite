@@ -152,5 +152,58 @@ namespace Test
                 calibrated_components.Select(c => c.reported_monoisotopic_mass)
                     .Contains(c2.reported_monoisotopic_mass)));
         }
+
+        [Test]
+        public void testReadFromPromex()
+        {
+            string filePath = @"E:\MassData\Glycan\FromKatie";
+            string fileLocation = Path.Combine(filePath, "013119_JeKoHLAI_tryptic_NCE203040.ms1ft");
+            string csvFileLocation = Path.Combine(filePath, "013119_JeKoHLAI_tryptic_NCE203040_ms1ft.csv");
+            Dictionary<int, List<string[]>> csv_feature_info = new Dictionary<int, List<string[]>>(); //key is feature id, value is row from .ms1ft file
+
+            if (File.Exists(csvFileLocation))
+            {
+                string[] lines = File.ReadAllLines(csvFileLocation);
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    string[] fields = lines[i].Split(',');
+                    if (fields.Length >= 7 && Int32.TryParse(fields[6], out int featureID))
+                    {
+                        if (csv_feature_info.TryGetValue(featureID, out List<string[]> value))
+                        {
+                            value.Add(fields);
+                        }
+                        else
+                        {
+                            csv_feature_info.Add(featureID, new List<string[]>() { fields });
+                        }
+                    }
+                }
+                //File.Delete(Path.Combine(filelocation + "_ms1ft.csv"));
+            }
+
+            if (File.Exists(fileLocation))
+            {
+                string[] lines = File.ReadAllLines(fileLocation);
+                List<string> new_lines = new List<string>();
+                new_lines.Add(lines[0] + "\tCharges\tCharge Intensities\tBest Fit");
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    string[] cs = lines[i].Split('\t');
+                    if (cs.Length < 17)
+                    {
+                        continue;
+                    }
+                    if (Int32.TryParse(cs[0], out int feature_ID) && csv_feature_info.TryGetValue(feature_ID, out List<string[]> fields) && fields.Count > 0)
+                    {
+                        //get charges, intensities for each charge, and fit
+                        List<int> charges = fields.Select(a => Int32.TryParse(a[1], out int charge) ? charge : 0).Where(c => c != 0).Distinct().OrderBy(c => c).ToList();
+                        List<double> intensities = charges.Select(c => fields.Where(a => a[1] == c.ToString()).Sum(fields2 => Double.TryParse(fields2[2], out double intensity) ? intensity : 0)).ToList();
+                        new_lines.Add(lines[i] + "\t" + string.Join(",", charges) + "\t" + string.Join(",", intensities) + "\t" + fields.First()[4]);
+                    }
+                }
+                File.WriteAllLines(Path.Combine(filePath,"test.tsv"), new_lines);
+            }
+        }
     }
 }
