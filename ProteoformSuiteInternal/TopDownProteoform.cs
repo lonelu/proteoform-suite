@@ -31,6 +31,16 @@ namespace ProteoformSuiteInternal
                     _topdown_ptm_set.ptm_combination.Count == 0 ?
                         "Unmodified" :
                     string.Join("; ", _topdown_ptm_set.ptm_combination.Select(ptm => ptm.position > 0 ? ptm.modification.OriginalId + "@" + ptm.position : UnlocalizedModification.LookUpId(ptm.modification)).ToList());
+
+                if (_topdown_ptm_set.ptm_combination != null && _topdown_ptm_set.ptm_combination.Count != 0 && _topdown_ptm_set.ptm_combination.Where(p => p.modification.ModificationType == "Sugar").Count() > 0)
+                {
+                    topdown_ptm_description = "";
+                    topdown_ptm_description += "H" + _topdown_ptm_set.ptm_combination.Where(p => p.modification.OriginalId == "H").Count();
+                    topdown_ptm_description += "N" + _topdown_ptm_set.ptm_combination.Where(p => p.modification.OriginalId == "N").Count();
+                    topdown_ptm_description += "A" + _topdown_ptm_set.ptm_combination.Where(p => p.modification.OriginalId == "A").Count();
+                    topdown_ptm_description += "G" + _topdown_ptm_set.ptm_combination.Where(p => p.modification.OriginalId == "G").Count();
+                    topdown_ptm_description += "F" + _topdown_ptm_set.ptm_combination.Where(p => p.modification.OriginalId == "F").Count();
+                }
             }
         }
 

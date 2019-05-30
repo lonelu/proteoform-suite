@@ -110,8 +110,10 @@ namespace ProteoformSuiteInternal
                     glycan_mods = new_mods;
                     continue;
                 }
-
-                all_known_modifications.AddRange(new_mods);
+                if (filename.EndsWith("SugarDatabase.txt"))
+                {
+                    all_known_modifications.AddRange(new_mods);
+                }
             }
             all_known_modifications = new HashSet<Modification>(all_known_modifications).ToList();
             uniprotModifications = make_modification_dictionary(all_known_modifications);

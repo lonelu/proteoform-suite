@@ -431,8 +431,16 @@ namespace ProteoformSuiteInternal
                     name += " " + (e.linked_proteoform_references.First() as TheoreticalProteoform).accession
                           + " " + e.begin + "to" + e.end + " " +
                           (e.ptm_set.ptm_combination.Count == 0 ?
-                            "Unmodified" :
+                            "Unmodified" :                          
                             string.Join("; ", e.ptm_set.ptm_combination.Select(ptm => Sweet.lollipop.theoretical_database.unlocalized_lookup[ptm.modification].id)));
+                if (e.ptm_set.ptm_combination.Where(b=>b.modification.ModificationType == "Sugar").Count() > 0)
+                {
+                    name = "";
+                    name += Math.Round(e.agg_mass, double_rounding) + "_Da_" + Math.Round(e.agg_rt, double_rounding) + "_min_";
+                    name += e.ptm_set.ptm_description;
+                }
+                
+
                 return name;
             }
             else if (p as TheoreticalProteoform != null)

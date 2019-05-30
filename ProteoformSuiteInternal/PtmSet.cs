@@ -30,6 +30,16 @@ namespace ProteoformSuiteInternal
                     "Unmodified" :
                     string.Join("; ", ptm_combination.Select(ptm => UnlocalizedModification.LookUpId(ptm.modification)).OrderBy(m => m).ToList());
 
+            if (ptm_combination!=null && ptm_combination.Count!= 0 && ptm_combination.Where(p => p.modification.ModificationType == "Sugar").Count() > 0)
+            {
+                ptm_description = "";
+                ptm_description += "H" + ptm_combination.Where(p => p.modification.OriginalId == "H").Count();
+                ptm_description += "N" + ptm_combination.Where(p => p.modification.OriginalId == "N").Count();
+                ptm_description += "A" + ptm_combination.Where(p => p.modification.OriginalId == "A").Count();
+                ptm_description += "G" + ptm_combination.Where(p => p.modification.OriginalId == "G").Count();
+                ptm_description += "F" + ptm_combination.Where(p => p.modification.OriginalId == "F").Count();
+            }
+
         }
 
         public PtmSet(List<Ptm> unique_ptm_combination, Dictionary<double, int> mod_ranks, int additional_ptm_penalization_factor)
