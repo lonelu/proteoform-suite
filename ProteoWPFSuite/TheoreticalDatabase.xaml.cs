@@ -159,7 +159,12 @@ namespace ProteoWPFSuite
         public void RunTheGamut(bool full_run)
         {
             ClearListsTablesFigures(true);
+
             Sweet.lollipop.theoretical_database.get_theoretical_proteoforms(Environment.CurrentDirectory);
+            //if (Sweet.lollipop.IsGlyFamilyStudy)
+            //{
+            //    Sweet.lollipop.target_proteoform_community.theoretical_proteoforms = new TheoreticalProteoform[0];
+            //}
             FillTablesAndCharts();
             if (!full_run && BottomUpReader.bottom_up_PTMs_not_in_dictionary.Count() > 0)
             {

@@ -51,7 +51,7 @@ namespace ProteoformSuiteInternal
             {
                 community.theoretical_proteoforms = new TheoreticalProteoform[0];
             }
-
+            Sweet.lollipop.target_proteoform_community.theoretical_proteoforms = new TheoreticalProteoform[0];
             theoretical_proteins.Clear();
 
             //Read the UniProt-XML and ptmlist
@@ -89,7 +89,10 @@ namespace ProteoformSuiteInternal
 
             //Generate lookup table for ptm sets based on rounded mass of eligible PTMs -- used in forming ET relations
             possible_ptmset_dictionary = make_ptmset_dictionary();
-            make_theoretical_proteoforms();
+            if (!Sweet.lollipop.IsGlyFamilyStudy)
+            {
+                make_theoretical_proteoforms();
+            }
         }
 
         public List<Modification> get_mods(string current_directory)
@@ -387,6 +390,10 @@ namespace ProteoformSuiteInternal
                 else topdown.accepted = false;
             }
             expanded_proteins = expanded_proteins.Concat(new_proteins).ToArray();
+            if (Sweet.lollipop.IsGlyFamilyStudy)
+            {
+                expanded_proteins = new_proteins.ToArray();
+            }
         }
 
         public void add_topdown_theoreticals(ProteinWithGoTerms prot, string seq, string accession, double unmodified_mass, int decoy_number, int lysine_count, List<TheoreticalProteoform> new_theoreticals, int ptm_set_counter, Dictionary<double, int> mod_ranks, int added_ptm_penalty)

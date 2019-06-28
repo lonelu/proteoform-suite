@@ -1565,5 +1565,11 @@ namespace ProteoformSuiteInternal
         }
 
         #endregion CLEAR METHODS
+
+        #region Glycopeptide
+        
+        public bool IsGlyFamilyStudy { get; set; }
+
+        #endregion
     }
 }

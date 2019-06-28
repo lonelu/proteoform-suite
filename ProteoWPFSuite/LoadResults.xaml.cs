@@ -607,6 +607,16 @@ namespace ProteoWPFSuite
             //MessageBox.Show(cmb_loadTable1.SelectedItem.ToString()+cmb_loadTable1.SelectedIndex + "," + cb_select);
         }
 
+        private void Rb_glyco_Checked(object sender, RoutedEventArgs e)
+        {
+            Sweet.lollipop.IsGlyFamilyStudy = true;
+        }
+
+        private void Rb_glyco_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Sweet.lollipop.IsGlyFamilyStudy = false;
+        }
+
         /*private void topbar_splitcontainer_SplitterMoved(object sender, SplitterEventArgs e)
 {
 

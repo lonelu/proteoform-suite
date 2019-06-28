@@ -65,7 +65,7 @@ namespace ProteoWPFSuite
                         MessageBox.Show("Go back and load in top-down results.");
                         return;
                     }
-                    if (Sweet.lollipop.target_proteoform_community.theoretical_proteoforms.Length == 0)
+                    if (Sweet.lollipop.target_proteoform_community.theoretical_proteoforms.Length == 0 && !Sweet.lollipop.IsGlyFamilyStudy)
                     {
                         MessageBox.Show("Go back and construct a theoretical database.");
                         return;
@@ -99,8 +99,8 @@ namespace ProteoWPFSuite
                 }
             }
             //need to refill theo database --> added theoreticsl
-            
-            MDIParent.theoreticalDatabase.FillTablesAndCharts();
+
+            MDIParent.theoreticalDatabase.FillTablesAndCharts();        
             FillTablesAndCharts();
         }
         public void ClearListsTablesFigures(bool clear_following)
@@ -137,7 +137,7 @@ namespace ProteoWPFSuite
             if (Sweet.lollipop.top_down_hits.Count > 0)
             {
                 Sweet.lollipop.clear_td();
-                Sweet.lollipop.topdown_proteoforms = Sweet.lollipop.aggregate_td_hits(Sweet.lollipop.top_down_hits, Sweet.lollipop.min_score_td, Sweet.lollipop.biomarker, Sweet.lollipop.tight_abs_mass);
+                Sweet.lollipop.topdown_proteoforms = Sweet.lollipop.aggregate_td_hits(Sweet.lollipop.top_down_hits, Sweet.lollipop.min_score_td, Sweet.lollipop.biomarker, Sweet.lollipop.tight_abs_mass);         
                 Sweet.lollipop.theoretical_database.make_theoretical_proteoforms();
             }
         }

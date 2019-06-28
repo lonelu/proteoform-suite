@@ -37,8 +37,9 @@
                     </Grid.RowDefinitions>
                     
                     <Grid Grid.Row="0" Grid.Column="0" Width="Auto" Background="White" Panel.ZIndex="1">
-                        <RadioButton x:Name="rb_neucode" Content="NeoCode Labeled" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,10,0,0" IsChecked="{Binding Path=CK_rbneucode,UpdateSourceTrigger=PropertyChanged}"/>
-                        <RadioButton x:Name="rb_unlabeled" IsChecked="True" Content="Unlabeled" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,31,0,0" />
+                        <RadioButton x:Name="rb_neucode" Content="NeoCode Labeled" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,30,0,0" IsChecked="{Binding Path=CK_rbneucode,UpdateSourceTrigger=PropertyChanged}"/>
+                        <RadioButton x:Name="rb_unlabeled" IsChecked="True" Content="Unlabeled" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,50,0,0" />
+                        <RadioButton x:Name="rb_glyco" Content="Glycopeptides" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Checked="Rb_glyco_Checked" Unchecked="Rb_glyco_Unchecked"/>
                     </Grid>
                     
                     <StackPanel x:Name="nmds" Orientation="Horizontal" Grid.ColumnSpan="2" Margin="5,5,0,0">

@@ -222,7 +222,7 @@ namespace ProteoWPFSuite
         #region Public Methods
         public bool ReadyToRunTheGamut()
         {
-            return Sweet.lollipop.target_proteoform_community.has_e_and_t_proteoforms;
+            return (Sweet.lollipop.target_proteoform_community.has_e_and_t_proteoforms || Sweet.lollipop.IsGlyFamilyStudy);
         }
 
         public void RunTheGamut(bool full_run)
