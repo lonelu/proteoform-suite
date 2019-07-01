@@ -8,6 +8,7 @@ using Accord.Math;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Proteomics.ProteolyticDigestion;
 using UsefulProteomicsDatabases;
+using System.Text;
 
 namespace ProteoformSuiteInternal
 {
@@ -302,9 +303,9 @@ namespace ProteoformSuiteInternal
                 }
             }
 
-            if (glycan)
+            if (Sweet.lollipop.IsGlyFamilyStudy)
             {
-                foreach (var mod in Sweet.lollipop.theoretical_database.glycan_mods)
+                foreach (var mod in Sweet.lollipop.theoretical_database.all_mods_with_mass_glyco)
                 {
                     if (!mods.ContainsKey(mod.IdWithMotif))
                     {
@@ -332,6 +333,18 @@ namespace ProteoformSuiteInternal
                     //if bad mod itll catch it to add to bad_topdown_ptms
                     try
                     {
+                        if (Sweet.lollipop.IsGlyFamilyStudy)
+                        {
+                            var glycanMods = GetGlycanModsFromFullSeq(full_sequence);
+                            foreach (var mod in glycanMods)
+                            {
+                                if (!mods.ContainsKey(mod.IdWithMotif))
+                                {
+                                    mods.Add(mod.IdWithMotif, mod);
+                                }
+                            }
+                        }
+
                         PeptideWithSetModifications modsIdentifier =
                             new PeptideWithSetModifications(full_sequence, mods);
 
@@ -440,7 +453,91 @@ namespace ProteoformSuiteInternal
 
             return true;
         }
+
+        public static Modification GenerateGlycanMod(string glycanMod)
+        {
+            ModificationMotif.TryGetMotif("N", out ModificationMotif finalMotif);
+            var mass = GetMassFromGlycanCompo(glycanMod);
+            Modification modification = new Modification(
+                _originalId: glycanMod,
+                _modificationType: "N-Glycosylation",
+                _monoisotopicMass: (double)mass,
+                _locationRestriction: "Anywhere.",
+                _target: finalMotif
+            );
+            return modification;
+        }
+
+        public static List<Modification> GetGlycanModsFromFullSeq(string full_sequence)
+        {
+            List<Modification> modifications = new List<Modification>();
+            StringBuilder currentModification = new StringBuilder();
+            bool currentlyReadingMod = false;
+            int bracketCount = 0;
+
+            for (int r = 0; r < full_sequence.Length; r++)
+            {
+                char c = full_sequence[r];
+
+                switch (c)
+                {
+                    case '[':
+                        currentlyReadingMod = true;
+
+                        if (bracketCount > 0)
+                        {
+                            currentModification.Append(c);
+                        }
+                        bracketCount++;
+                        break;
+
+                    case ']':
+                        string modId = null;
+                        bracketCount--;
+
+                        if (bracketCount == 0)
+                        {
+                            try
+                            {
+                                string modString = currentModification.ToString();
+                                int splitIndex = modString.IndexOf(':');
+                                string modType = modString.Substring(0, splitIndex);
+                                modId = modString.Substring(splitIndex + 1, modString.Length - splitIndex - 1);
+                                string mod = modId.Substring(0, modId.IndexOf(' '));
+                                if (modType.Contains("Glycosylation"))
+                                {
+                                    modifications.Add(GenerateGlycanMod(mod));
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                throw new MzLibUtil.MzLibException(
+                                    "Error while trying to parse string into peptide: " + e.Message);
+                            }
+
+                        }
+                        break;
+                    default:
+                        if (currentlyReadingMod)
+                        {
+                            currentModification.Append(c);
+                        }
+                        break;
+                }
+            }
+
+            return modifications;
+        }
+
+        public static double GetMassFromGlycanCompo(string id)
+        {
+            var x = id.Split(new[] { 'H', 'N', 'A', 'G', 'F' }, StringSplitOptions.RemoveEmptyEntries);
+            double mass = int.Parse(x[0]) * 162.05282 +
+                int.Parse(x[1]) * 203.07937 +
+                int.Parse(x[2]) * 291.09542 +
+                int.Parse(x[3]) * 307.09033 +
+                int.Parse(x[4]) * 146.05791;
+            return mass;
+        }
     }
-
-
 }

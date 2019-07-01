@@ -23,7 +23,7 @@ namespace ProteoformSuiteInternal
         public Dictionary<string, List<Modification>> uniprotModifications = new Dictionary<string, List<Modification>>();
 
         public List<Modification> variableModifications = new List<Modification>();
-        public List<Modification> glycan_mods = new List<Modification>();
+        public List<Modification> all_mods_with_mass_glyco = new List<Modification>();
         public List<Modification> all_mods_with_mass = new List<Modification>();
         public Dictionary<Modification, UnlocalizedModification> unlocalized_lookup = new Dictionary<Modification, UnlocalizedModification>();
 
@@ -101,6 +101,8 @@ namespace ProteoformSuiteInternal
             Dictionary<string, int> formalChargesDictionary = Loaders.GetFormalChargesDictionary(psiModDeserialized);
             Loaders.LoadElements();
             List<Modification> all_known_modifications = new List<Modification>();
+            List<Modification> all_known_modifications_glyco = new List<Modification>();
+
             foreach (string filename in Directory.GetFiles(Path.Combine(current_directory, "Mods")))
             {
                 List<Modification> new_mods = !filename.EndsWith("variable.txt") || Sweet.lollipop.methionine_oxidation ?
@@ -108,14 +110,30 @@ namespace ProteoformSuiteInternal
                     new List<Modification>(); // Empty variable modifications if not selected
                 if (filename.EndsWith("variable.txt"))
                     variableModifications = new_mods;
-                if (filename.EndsWith("UniprotGlycanDatabase.txt"))
-                {
-                    glycan_mods = new_mods;
-                    continue;
-                }
 
-                all_known_modifications.AddRange(new_mods);
+                if (Sweet.lollipop.IsGlyFamilyStudy)
+                {
+                    if (!filename.EndsWith("SugarDatabase.txt"))
+                    {
+                        all_known_modifications_glyco.AddRange(new_mods);
+                    }
+                    else
+                    {
+                        all_known_modifications.AddRange(new_mods);
+                    }
+                }
+                else
+                {
+                    all_known_modifications.AddRange(new_mods);
+                }
             }
+            if (Sweet.lollipop.IsGlyFamilyStudy)
+            {
+                all_known_modifications_glyco = new HashSet<Modification>(all_known_modifications_glyco).ToList();
+                var uniprotModifications_glyco = make_modification_dictionary(all_known_modifications_glyco);
+                all_mods_with_mass_glyco = uniprotModifications_glyco.SelectMany(kv => kv.Value).Concat(variableModifications).ToList();
+            }
+
             all_known_modifications = new HashSet<Modification>(all_known_modifications).ToList();
             uniprotModifications = make_modification_dictionary(all_known_modifications);
             all_mods_with_mass = uniprotModifications.SelectMany(kv => kv.Value).Concat(variableModifications).ToList();

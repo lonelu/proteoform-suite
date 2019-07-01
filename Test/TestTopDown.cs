@@ -309,7 +309,7 @@ namespace Test
             Sweet.lollipop.enter_input_files(new string[] { Path.Combine(TestContext.CurrentContext.TestDirectory, "uniprot_yeast_test_12entries.xml") }, Lollipop.acceptable_extensions[2], Lollipop.file_types[2], Sweet.lollipop.input_files, false);
             Sweet.lollipop.decoy_databases = 1;
             Sweet.lollipop.theoretical_database.get_theoretical_proteoforms(TestContext.CurrentContext.TestDirectory);
-            Assert.AreEqual(1670, Sweet.lollipop.theoretical_database.glycan_mods.Count);
+            //Assert.AreEqual(1670, Sweet.lollipop.theoretical_database.glycan_mods.Count);
             Sweet.lollipop.read_in_td_hits();
             Assert.AreEqual(6, Sweet.lollipop.top_down_hits.Count);
             Assert.AreEqual(68, Sweet.lollipop.top_down_hits.Sum(h => h.ptm_list.Count));
@@ -324,6 +324,15 @@ namespace Test
             Sweet.lollipop.theoretical_database.uniprotModifications.Remove("H");
             Sweet.lollipop.read_in_td_hits();
             Assert.AreEqual(0, Sweet.lollipop.top_down_hits.Count);
+        }
+
+        [Test]
+        public void TestGlycanMod()
+        {
+            var mass = TopDownReader.GetMassFromGlycanCompo("H5N4A2G0F1");
+            Assert.That(Math.Round(mass, 5) == 2350.83033);
+            var test = TopDownReader.GetGlycanModsFromFullSeq("GYYN[N-Glycosylation:H5N4A2G0F1 on N]QSEAGSHTVQR");
+            Assert.That(test.Count == 1);
         }
 
         [Test]
